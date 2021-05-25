@@ -8,10 +8,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     let platforms=[]
     let upTimerId
     let downTimerId
+    let isJumping = false
 
     function createDoodler(){
         grid.appendChild(doodler)
         doodler.classList.add('doodler')
+        doodlerLeftSpace = platforms[0].left+12.5
+        doodlerBottomSpace = platforms[0].bottom+15
         doodler.style.left = doodlerLeftSpace+"px"
         doodler.style.bottom = doodlerBottomSpace+"px"
     }
@@ -36,7 +39,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             platform.visual.classList.add("platform")
 
             platforms.push(platform)
-            //console.log(platforms)
+            console.log(platforms)
         }
     }
 
@@ -55,16 +58,18 @@ document.addEventListener('DOMContentLoaded',()=>{
 
     function jump(){
         clearInterval(downTimerId)
+        isJumping = true
         upTimerId = setInterval(() => {
-            doodlerBottomSpace += 20
+            doodlerBottomSpace += 1
             doodler.style.bottom = doodlerBottomSpace +"px"
-            if(doodlerBottomSpace>500)
+            if(doodlerBottomSpace>300)
                 fall()
         }, 30);
     }
 
     function fall(){
         clearInterval(upTimerId)
+        isJumping = false
         downTimerId = setInterval(() => {
             doodlerBottomSpace -= 10
             doodler.style.bottom = doodlerBottomSpace +"px" 
@@ -80,10 +85,23 @@ document.addEventListener('DOMContentLoaded',()=>{
         isGameOver = true
     }
 
+    function control(e){
+        if (e.key == "ArrowLeft") {
+            console.log("left pressed")
+        }
+        if (e.key == "ArrowRight") {
+            console.log("right pressed")
+        }
+        if (e.key == "ArrowUp") {
+            console.log("up pressed")
+        }
+
+    }
+
     function start(){
     if(!isGameOver)
-        createDoodler()
         createPlatforms()
+        createDoodler()
         setInterval(movePlatforms,30);
         jump()
     }
