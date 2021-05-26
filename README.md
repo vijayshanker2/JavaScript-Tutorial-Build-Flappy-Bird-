@@ -1,4 +1,4 @@
 # JavaScript Tutorial
- Build Flappy Bird 
+ Build Doodle Jump 
  
  https://youtu.be/8xPsg6yv7TU
