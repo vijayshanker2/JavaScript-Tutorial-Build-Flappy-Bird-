@@ -11,12 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let downTimerId
     let leftTimerId
     let rightTimerId
-
     let isJumping = false
     let isGoingLeft = false
     let isGoingRight = false
-
-
+    let score = 0
 
     function createDoodler() {
         grid.appendChild(doodler)
@@ -34,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.visual = document.createElement('div')
         }
     }
+
     function createPlatforms() {
         for (let i = 0; i < platformCount; i++) {
 
@@ -52,13 +51,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function movePlatforms() {
-        if (doodlerBottomSpace > 0) {
+        if (doodlerBottomSpace > 200) {
             platforms.forEach(platform => {
-                platform.bottom -= 0.5
+                platform.bottom -= 1
                 let visual = platform.visual
                 visual.style.bottom = platform.bottom + "px"
-                if (platform.bottom < 2)
-                    visual.style.display = "none"
+                if (platform.bottom < 10) {
+                    let firstPlatform = platforms[0].visual
+                    firstPlatform.classList.remove('platform')
+                    platforms.shift()
+
+                    //create a new platform
+                    let platform = new Platform(600)
+                    platform.visual.style.bottom = platform.bottom + "px"
+                    platform.visual.style.left = platform.left + "px"
+                    grid.appendChild(platform.visual)
+                    platform.visual.classList.add("platform")
+
+                    platforms.push(platform)
+                    score++
+                }
             })
         }
     }
@@ -69,10 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         upTimerId = setInterval(() => {
             doodlerBottomSpace += 20
             doodler.style.bottom = doodlerBottomSpace + "px"
-            // if (doodlerBottomSpace > 515) {
-            //     gameOver()
-            // }
-            // else
             if (doodlerBottomSpace > startPoint + 200) {
                 fall()
             }
@@ -94,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         (doodlerBottomSpace >= platform.bottom) &&
                         (doodlerBottomSpace <= platform.bottom + 15) &&
                         (doodlerLeftSpace + 60 >= platform.left) &&
-                        (doodlerLeftSpace  <= platform.left + 85) &&
+                        (doodlerLeftSpace <= platform.left + 85) &&
                         (!isJumping)
                     ) {
                         console.log("landed on ", platform)
@@ -108,16 +116,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function gameOver() {
         isGameOver = true
-        //document.removeEventListener("keyup", control)
+        while (grid.firstChild) {
+            grid.removeChild(grid.firstChild)
+        }
+        let gameoverDiv = document.createElement('div')
+        gameoverDiv.classList.add("gameover")
+        grid.appendChild(gameoverDiv)
+
+        let gameoverText = document.createElement('h1')
+        let scoreText = document.createElement('h2')
+        gameoverText.classList.add('text')
+        scoreText.classList.add('score')
+        gameoverText.textContent = "Game Over"
+        scoreText.innerHTML = "Score: " + score
+        gameoverDiv.appendChild(gameoverText)
+        gameoverDiv.appendChild(scoreText)
+
         clearInterval(upTimerId)
         clearInterval(downTimerId)
         clearInterval(leftTimerId)
         clearInterval(rightTimerId)
-      
-        console.log("game over")
-       
 
-      //  doodler.style.display = "None"
+        console.log("game over")
     }
 
     function control(e) {
@@ -180,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
             createDoodler()
             setInterval(movePlatforms, 30);
             jump()
-
             document.addEventListener("keyup", control)
         }
     }
